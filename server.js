@@ -1,6 +1,8 @@
 const Vue = require('vue')
 const express = require('express')
 const fs = require('fs')
+const {createBundleRenderer} = require('vue-server-renderer')
+const setupDevServer = require('./build/setup-dev-server')
 
 const server = express()
 
@@ -10,12 +12,13 @@ server.use('/dist', express.static('./dist'))
 const isProd = process.env.NODE_ENV === 'production'
 
 let renderer
+let onReady
 if (isProd) {
   const serverBundle = require('./dist/vue-ssr-server-bundle.json')
   const clientManifest = require('./dist/vue-ssr-client-manifest.json')
-  const { static } = require('express')
+  const {static} = require('express')
   const template = fs.readFileSync('./index.template.html', 'utf-8')
-  renderer = require('vue-server-renderer').createBundleRenderer(serverBundle, {
+  renderer = createBundleRenderer(serverBundle, {
     template,
     clientManifest
   })
@@ -23,7 +26,12 @@ if (isProd) {
   // 开发模式 -> 监视打包构建 -> 重新生成 Renderer 渲染器
   // 为什么传server？在开发模式给web服务挂载中间件
   // 每当监视构建打包完成后，回调函数会被执行
-  setupDevServer(server, () => {})
+  onReady = setupDevServer(server, (serverBundle, template, clientManifest) => {
+    renderer = createBundleRenderer(serverBundle, {
+      template,
+      clientManifest
+    })
+  })
 }
 
 const render = (req, res) => {
@@ -41,8 +49,9 @@ const render = (req, res) => {
   })
 }
 
-server.get('/', isProd ? renderer : (req, res) => {
+server.get('/', isProd ? renderer : async (req, res) => {
   // TODO: 等待有了 Renderer 渲染器以后，调用 render 进行渲染
+  await onReady
   render()
 })
 
