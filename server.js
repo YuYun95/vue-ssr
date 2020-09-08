@@ -6,7 +6,7 @@ const setupDevServer = require('./build/setup-dev-server')
 
 const server = express()
 
-// 请求前缀，使用express中间件的static处理
+// 请求前缀，使用express中间件的static处理；express.static 处理的是物理磁盘中的资源文件
 server.use('/dist', express.static('./dist'))
 
 const isProd = process.env.NODE_ENV === 'production'
@@ -50,9 +50,9 @@ const render = (req, res) => {
 }
 
 server.get('/', isProd ? renderer : async (req, res) => {
-  // TODO: 等待有了 Renderer 渲染器以后，调用 render 进行渲染
+  // 等待有了 Renderer 渲染器以后，调用 render 进行渲染
   await onReady
-  render()
+  render(req, res)
 })
 
 server.listen(3000, () => {
