@@ -18,6 +18,7 @@
     "cross-env": "^7.0.2",
     "express": "^4.17.1",
     "vue": "^2.6.12",
+    "vue-router": "^3.4.3",
     "vue-server-renderer": "^2.6.12",
     "webpack-dev-middleware": "^3.7.2",
     "webpack-hot-middleware": "^2.25.0"

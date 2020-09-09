@@ -34,22 +34,24 @@ if (isProd) {
   })
 }
 
-const render = (req, res) => {
-  renderer.renderToString({
-    title: '拉勾教育',
-    meta: `
+const render = async (req, res) => {
+  try {
+    const html = await renderer.renderToString({
+      title: '拉勾教育',
+      meta: `
       <meta name="description" content="拉勾教育" >
-    `
-  }, (err, html) => {
-    if (err) {
-      return res.status(500).end('Internal Server Error.')
-    }
+    `,
+      url: req.url
+    })
     res.setHeader('Content-Type', 'text/html; charset=utf8') // 设置编码，防止乱码
     res.end(html)
-  })
+  } catch (err) {
+    return res.status(500).end('Internal Server Error.')
+  }
 }
 
-server.get('/', isProd ? renderer : async (req, res) => {
+// 服务端路由设置为 *，意味着所有的路由（服务端本身的路由【express路由】）都会进入这里
+server.get('*', isProd ? render : async (req, res) => {
   // 等待有了 Renderer 渲染器以后，调用 render 进行渲染
   await onReady
   render(req, res)
