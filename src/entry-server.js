@@ -11,8 +11,12 @@ export default async context => {
   // 就已经准备就绪。（如，异步路由）
   const { app, router } = createApp()
 
+  const meta = app.$meta() // 一定要在路由导航之前
+
   // 设置服务器端 router 的位置
   router.push(context.url) // 拿到客户端请求路径，设置路由
+
+  context.meta = meta // 路由导航之后
 
   // 等到 router 将可能的异步组件和钩子函数解析完
   // new Promise((resolve, reject) => {

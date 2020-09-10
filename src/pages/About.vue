@@ -6,7 +6,10 @@
 
 <script>
 export default {
-  name: "About"
+  name: "About",
+  metaInfo: {
+    title: '关于'
+  }
 }
 </script>
 
