@@ -4,9 +4,11 @@
 
 import { createApp } from './app'
 
-// 客户端特定引导逻辑……
+const { app, router, store } = createApp()
 
-const { app, router } = createApp()
+if (window.__INITIAL_STATE__) {
+  store.replaceState(window.__INITIAL_STATE__) // 替换容器状态(把服务端发送过来的容器状态，同步到客户端容器状态)
+}
 
 router.onReady(() => {
   app.$mount('#app')
